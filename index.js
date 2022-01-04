@@ -221,30 +221,19 @@ app.post("/api/v1/create/:database/:table", (req, res) => {
   res.send("Table created");
 });
 
-app.get("/api/v1/data/:database/:table", (req, res) => {
-  let db = new sqlite3.Database(`./${req.params.database}.db`);
-  db.serialize(() => {
-    // Add some sample data
-    db.run(`INSERT INTO ${req.params.table} (name, age) VALUES ("John", 20)`);
-    db.run(`INSERT INTO ${req.params.table} (name, age) VALUES ("Jane", 30)`);
-    db.run(`INSERT INTO ${req.params.table} (name, age) VALUES ("Joe", 40)`);
-    db.run(`INSERT INTO ${req.params.table} (name, age) VALUES ("Jill", 50)`);
-    db.run(`INSERT INTO ${req.params.table} (name, age) VALUES ("Jack", 60)`);
-  });
-  db.close();
-  res.send("Data added");
-});
 
 app.get("/api/v1/get/:database/:table", (req, res) => {
   let db = new sqlite3.Database(`./${req.params.database}.db`);
   db.all(`SELECT * FROM ${req.params.table}`, (err, rows) => {
     if (err) {
-      throw err;
+      res.status(500).send(err)
     }
     res.send(rows);
   });
   db.close();
 });
+
+// Check if the table exists
 
 app.listen(3000, () => {
   console.log("server started");
